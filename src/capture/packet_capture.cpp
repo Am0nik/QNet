@@ -5,6 +5,7 @@
 #include <iomanip>
 
 #include "qnet/packet_capture.hpp"
+#include "qnet/ethernet_parser.hpp"
 
 volatile std::sig_atomic_t running = 1;
 
@@ -20,13 +21,13 @@ void PacketCapture::start(){
     pcap_if_t *alldevs = nullptr;
     char errbuf[PCAP_ERRBUF_SIZE]={};
     if(pcap_findalldevs(&alldevs,errbuf) == -1){//if no interfaces are found
-        std::cout << "EROR:" << errbuf << '\n';
+        std::cout << "ERROR:" << errbuf << '\n';
         return;
     }
 
     std::vector<pcap_if_t*> devices;//devices list
 
-    std::cout << "Available network intefaces:\n";
+    std::cout << "Available network interfaces:\n";
 
     for( pcap_if_t *dev = alldevs;dev!=nullptr;dev=dev->next){
         devices.push_back(dev);//add a new device to list
@@ -94,6 +95,8 @@ void PacketCapture::start(){
                 << " | Length: "<<header->len << " bytes"
                 << " | Captured: "<<header->caplen << " bytes"
                 <<'\n';
+            EthernetParser::parse(data, header->caplen);
+            
         }else if(result == 0){
             continue;
         }else if(result == -1){
