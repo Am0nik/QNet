@@ -9,8 +9,6 @@ int main(){
     PacketCapture capture;
     capture.start();
 
-    
-
 
     std::cout << "QNet is ready\n";
     return 0;
